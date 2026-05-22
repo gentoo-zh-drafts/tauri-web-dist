@@ -103,7 +103,6 @@ jobs:
       - name: upload golang deps to release artifaces
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ inputs.P }}
           name: ${{ inputs.P }}
           body: |
             -tag: `${{ inputs.P }}`
