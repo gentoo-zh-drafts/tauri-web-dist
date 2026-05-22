@@ -29,18 +29,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
       - name: Checkout input repo
         uses: actions/checkout@v6
         with:
           repository: ${{ inputs.REPO }}
           ref: ${{ inputs.TAG }}
           fetch-depth: 0
-          path: "input"
+
+      - name: Generate timestamp
+        id: timestamp
+        run: |
+          echo "BUILD_TIME=$(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
 
       - name: delete old tag
         env:
@@ -61,7 +60,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: pnpm
+          cache: 'pnpm'
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -81,7 +80,9 @@ jobs:
         with:
           tagName: ${{ inputs.TAG }}
           releaseName: ${{ inputs.P }}
-          releaseBody: 'See the assets to download this version and install.'
+          releaseBody: |
+            -tag: `${{ inputs.P }}`
+            -Build Time: ${{ env.BUILD_TIME }}
           releaseDraft: true
           prerelease: false
           args: ''
