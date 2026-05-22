@@ -72,6 +72,9 @@ jobs:
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
             librsvg2-dev patchelf xdg-utils
 
+      - name: Run pnpm install
+        run: pnpm install --frozen-lockfile
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -100,6 +103,10 @@ jobs:
       - name: upload golang deps to release artifaces
         uses: softprops/action-gh-release@v3
         with:
-          files: |
-            /tmp/${{ inputs.P }}-web.tar.xz
+          tag_name: ${{ inputs.P }}
+          name: ${{ inputs.P }}
+          body: |
+            -tag: `${{ inputs.P }}`
+            -Build Time: ${{ env.BUILD_TIME }}
+          files: /tmp/${{ inputs.P }}-web.tar.xz
           tag_name: ${{ inputs.P }}
