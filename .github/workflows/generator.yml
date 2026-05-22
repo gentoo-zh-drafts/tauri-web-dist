@@ -88,13 +88,6 @@ jobs:
           tar --create --auto-compress --file /tmp/${{ inputs.P }}-web.tar.xz ./dist
           ls -lh /tmp/${{ inputs.P }}-web.tar.xz
 
-      - name: push tag
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force: true
-          tags: true
-
       - name: upload golang deps to release artifaces
         uses: softprops/action-gh-release@v3
         with:
@@ -104,3 +97,5 @@ jobs:
             -Build Time: ${{ env.BUILD_TIME }}
           files: /tmp/${{ inputs.P }}-web.tar.xz
           tag_name: ${{ inputs.P }}
+          draft: false
+          prerelease: false
