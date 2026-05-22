@@ -79,14 +79,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ inputs.TAG }}
-          releaseName: ${{ inputs.P }}
-          releaseBody: |
-            -tag: `${{ inputs.P }}`
-            -Build Time: ${{ env.BUILD_TIME }}
-          releaseDraft: true
-          prerelease: false
-          args: ''
+          includeDebug: false
 
       - name: Compress dist to tar.xz
         run: |
