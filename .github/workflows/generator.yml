@@ -73,10 +73,11 @@ jobs:
         with:
           includeDebug: false
           projectPath: ./${{ inputs.WORKDIR }}
+          distPath: ./${{ inputs.WORKDIR }}/dist
 
       - name: Compress dist to tar.xz
         run: |
-          tar --create --auto-compress --file /tmp/${{ inputs.P }}-web.tar.xz ./dist
+          tar --create --auto-compress --file /tmp/${{ inputs.P }}-web.tar.xz ./${{ inputs.WORKDIR }}/dist
           ls -lh /tmp/${{ inputs.P }}-web.tar.xz
 
       - name: upload web dist tar.xz to release artifaces
