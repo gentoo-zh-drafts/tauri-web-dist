@@ -2,21 +2,21 @@ name: "Generator"
 on:
   workflow_dispatch:
     inputs:
-      # https://github.com/XTLS/Xray-core v24.11.11
-      # net-proxy/Xray/Xray-24.11.11.ebuild
-      # release artiface: ${PN}-${PV}-deps.tar.xz: Xray-24.11.11-deps.tar.xz
-      # release tag: ${P}=${PN}-${PV}: Xray-24.11.11
+      # https://github.com/clash-verge-rev/clash-verge-rev
+      # net-proxy/clash-verge-rev/clash-verge-rev-2.5.1.ebuild
+      # release artiface: ${PN}-${PV}-web.tar.xz: clash-verge-rev-2.5.1-web.tar.xz
+      # release tag: ${P}=${PN}-${PV}: clash-verge-rev-2.5.1
 
       REPO:
-        description: "github repo name: XTLS/Xray-core"
+        description: "github repo name: e.g. clash-verge-rev/clash-verge-rev"
         required: true
 
       TAG:
-        description: "github tag: v24.11.11"
+        description: "github tag: e.g. v2.5.1"
         required: true
 
       P:
-        description: "P in ebuild: Xray-24.11.11"
+        description: "P in ebuild: e.g. clash-verge-rev-2.5.1"
         required: true
 
       WORKDIR:
@@ -75,7 +75,7 @@ jobs:
             libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
             librsvg2-dev patchelf xdg-utils
 
-      - uses: tauri-apps/tauri-action@v1
+      - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
