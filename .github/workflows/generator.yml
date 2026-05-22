@@ -1,0 +1,106 @@
+name: "Generator"
+on:
+  workflow_dispatch:
+    inputs:
+      # https://github.com/XTLS/Xray-core v24.11.11
+      # net-proxy/Xray/Xray-24.11.11.ebuild
+      # release artiface: ${PN}-${PV}-deps.tar.xz: Xray-24.11.11-deps.tar.xz
+      # release tag: ${P}=${PN}-${PV}: Xray-24.11.11
+
+      REPO:
+        description: "github repo name: XTLS/Xray-core"
+        required: true
+
+      TAG:
+        description: "github tag: v24.11.11"
+        required: true
+
+      P:
+        description: "P in ebuild: Xray-24.11.11"
+        required: true
+
+      WORKDIR:
+        description: "(optional) source directory to perform scripts"
+        default: ''
+
+jobs:
+  Generator:
+    permissions: write-all # required by push tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Checkout input repo
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ inputs.REPO }}
+          ref: ${{ inputs.TAG }}
+          fetch-depth: 0
+          path: "input"
+
+      - name: delete old tag
+        env:
+          P: ${{ inputs.P }}
+          LANG: ${{ inputs.LANG }}
+        run: |
+          git config --global --add safe.directory '*'
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git tag --delete ${P} || echo yes
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Tauri dependencies
+        run: |
+          export NEEDRESTART_SUSPEND=1
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update
+          sudo -E apt-get install -y \
+            libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+            librsvg2-dev patchelf xdg-utils
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ inputs.TAG }}
+          releaseName: ${{ inputs.P }}
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ''
+
+      - name: Compress dist to tar.xz
+        run: |
+          tar --create --auto-compress --file /tmp/${{ inputs.P }}-web.tar.xz ./dist
+          ls -lh /tmp/${{ inputs.P }}-web.tar.xz
+
+      - name: push tag
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
+          tags: true
+
+      - name: upload golang deps to release artifaces
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            /tmp/${{ inputs.P }}-web.tar.xz
+          tag_name: ${{ inputs.P }}
