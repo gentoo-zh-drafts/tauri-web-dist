@@ -65,7 +65,9 @@ jobs:
             librsvg2-dev patchelf xdg-utils
 
       - name: Run pnpm install
-        run: pnpm install --frozen-lockfile
+        # pnpm 11 blocks dependency build scripts by default (strictDepBuilds); the web build needs
+        # them (esbuild etc.), so allow them non-interactively.
+        run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
 
       - name: Try tauri build(nonfatal)
         uses: tauri-apps/tauri-action@v0
