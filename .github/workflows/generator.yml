@@ -70,7 +70,7 @@ jobs:
         run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
 
       - name: Try tauri build(nonfatal)
-        uses: tauri-apps/tauri-action@v1
+        uses: tauri-apps/tauri-action@v0
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
