@@ -24,6 +24,9 @@ on:
         description: "(optional) source directory to perform scripts"
         default: ''
 
+      EXTRDIR:
+        description: "(optional) extra directory to compress & upload"
+
 jobs:
   Generator:
     permissions: write-all # required by push tag
@@ -83,6 +86,12 @@ jobs:
           tar --create --auto-compress --file /tmp/${{ inputs.P }}-web.tar.xz ./${{ inputs.WORKDIR }}/dist
           ls -lh /tmp/${{ inputs.P }}-web.tar.xz
 
+      - name: Compress extra resources directory
+        if: inputs.EXTRDIR != ''
+        run: |
+          tar --create --auto-compress --file /tmp/${{ inputs.P }}-extra.tar.xz ./${{ inputs.EXTRDIR }}/
+          ls -lh /tmp/${{ inputs.P }}-extra.tar.xz
+
       - name: upload web dist tar.xz to release artifaces
         uses: softprops/action-gh-release@v3
         with:
@@ -90,7 +99,7 @@ jobs:
           body: |
             -tag: `${{ inputs.P }}`
             -Build Time: ${{ env.BUILD_TIME }}
-          files: /tmp/${{ inputs.P }}-web.tar.xz
+          files: /tmp/${{ inputs.P }}-*.tar.xz
           tag_name: ${{ inputs.P }}
           draft: false
           prerelease: false
